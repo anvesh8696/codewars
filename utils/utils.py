@@ -27,15 +27,6 @@ TEMPLATE_ENVIRONMENT = Environment(
 Kata = namedtuple('Kata', 'name url slug rank description')
 
 
-def get_python_version():
-    if sys.version.startswith('3'):
-        return 'python3'
-    elif sys.version.startswith('2'):
-        return 'python2'
-    else:
-        raise EnvironmentError('Unknown Python version')
-
-
 def get_kata_slug(kata_name, directory):
     """Get kata id or slug from solution file"""
     with open(join(directory, kata_name)) as solution:
@@ -166,14 +157,14 @@ def process_kata_data(data):
     return Kata(name, url, slug, rank, description)
 
 
-def create_file(data, python, file_type):
+def create_file(data, file_type):
     if file_type == 'solution':
         filename = data.slug.replace('-', '_') + '.py'
-        directory = os.path.join(python, 'kyu_' + data.rank)
+        directory = os.path.join('solutions', 'kyu_' + data.rank)
         full_path = os.path.join(directory, filename)
     elif file_type == 'test':
         filename = 'test_' + data.slug.replace('-', '_') + '.py'
-        directory = os.path.join('tests', python, 'kyu_' + data.rank)
+        directory = os.path.join('tests', 'solutions', 'kyu_' + data.rank)
         full_path = os.path.join(directory, filename)
     else:
         raise ValueError('Unknown file type')
@@ -181,7 +172,6 @@ def create_file(data, python, file_type):
     context = {
         'kata': {
             'title': data.name,
-            'python': python,
             'filename': data.slug.replace('-', '_'),
             'url': data.url,
             'description': data.description,
@@ -199,15 +189,15 @@ def create_file(data, python, file_type):
             file.write(template)
 
 
-def create_solution_file(data, python):
-    create_file(data, python, 'solution')
+def create_solution_file(data):
+    create_file(data, 'solution')
 
 
-def create_test_file(data, python):
-    create_file(data, python, 'test')
+def create_test_file(data):
+    create_file(data, 'test')
 
 
-def new_solution(slug, python):
+def new_solution(slug):
     """Create new solution template"""
     sys.stdout.write('Get kata data...'.ljust(STRING_LENGTH))
     data = get_kata_data(slug, ACCESS_KEY)
@@ -218,9 +208,9 @@ def new_solution(slug, python):
     sys.stdout.write('DONE\n')
 
     sys.stdout.write('Create solution file...'.ljust(STRING_LENGTH))
-    create_solution_file(data, python)
+    create_solution_file(data)
     sys.stdout.write('DONE\n')
 
     sys.stdout.write('Create test file...'.ljust(STRING_LENGTH))
-    create_test_file(data, python)
+    create_test_file(data)
     sys.stdout.write('DONE\n')

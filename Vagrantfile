@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
-  config.vm.box = "ubuntu/xenial64"
+  config.vm.box = "ubuntu/trusty64"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -69,13 +69,11 @@ Vagrant.configure("2") do |config|
     apt-get -y install python-virtualenv
 
     mkdir .virtualenvs
-    virtualenv -p python .virtualenvs/codewars2
-    virtualenv -p python3 .virtualenvs/codewars3
+    virtualenv -p python .virtualenvs/codewars
   SHELL
 
   # On each start
   config.vm.provision "shell", run: "always", inline: <<-SHELL
-    .virtualenvs/codewars2/bin/pip install -r /vagrant/requirements.txt
-    .virtualenvs/codewars3/bin/pip install -r /vagrant/requirements.txt
+    .virtualenvs/codewars/bin/pip install -r /vagrant/requirements.txt
   SHELL
 end

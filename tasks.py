@@ -3,15 +3,20 @@ import sys
 
 from invoke import task
 
-from utils.utils import get_python_version, new_solution, sort_katas
+from utils.utils import new_solution, sort_katas
 
 
 @task
 def check_venv(ctx):
     """Checks if virtualenv is active"""
-    pyenv = os.environ.get('PYENV_VIRTUAL_ENV', False)       # Is pyenv active?
-    virtualenv_unix = hasattr(sys, 'real_prefix')            # Is virtualenv on linux active?
-    virtualenv_windows = sys.base_prefix != sys.exec_prefix  # Is virtualenv on unix active?
+    # Is pyenv active?
+    pyenv = os.environ.get('PYENV_VIRTUAL_ENV', False)
+
+    # Is virtualenv on linux active?
+    virtualenv_unix = hasattr(sys, 'real_prefix')
+
+    # Is virtualenv on unix active?
+    virtualenv_windows = sys.base_prefix != sys.exec_prefix
 
     # ToDo: Check if unix venv check can be removed
     if not any([pyenv, virtualenv_unix, virtualenv_windows]):
@@ -21,12 +26,10 @@ def check_venv(ctx):
 @task(check_venv)
 def update(ctx):
     """Updates virtual environments"""
-    python2 = '~/.pyenv/versions/codewars2/bin'
-    python3 = '~/.pyenv/versions/codewars3/bin'
+    python = '~/.pyenv/versions/codewars/bin'
 
     ctx.run('pur -r requirements.txt')
-    ctx.run('{}/pip install -r requirements.txt'.format(python2))
-    ctx.run('{}/pip install -r requirements.txt'.format(python3))
+    ctx.run('{}/pip install -r requirements.txt'.format(python))
 
 
 @task(check_venv)
@@ -37,17 +40,14 @@ def sort(ctx):
 
 @task(check_venv)
 def new(ctx, slug):
-    python = get_python_version()
-    new_solution(slug, python)
+    new_solution(slug)
 
 
 @task(check_venv)
 def test(ctx):
-    python = get_python_version()
-    ctx.run('python -m pytest --doctest-modules {0} tests/{0}'.format(python))
+    ctx.run('python -m pytest --doctest-modules solutions tests')
 
 
 @task(check_venv)
 def syntax(ctx):
-    python = get_python_version()
-    ctx.run('python -m pylint {0} tests/{0}'.format(python))
+    ctx.run('python -m pylint solutions tests')
